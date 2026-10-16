@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelAI — Multi-Agent Penetration Testing Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Navigation Bar -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <span class="brand-name">Sentinel<span class="highlight">AI</span></span>
+        <span class="brand-badge">Agentic SecOps</span>
+      </div>
+
+      <nav class="nav-links" id="mainNav" style="display: none;">
+        <button class="nav-btn active" data-page="dashboard">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Overview
+        </button>
+        <button class="nav-btn" data-page="assessments">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Assessments
+        </button>
+        <button class="nav-btn" data-page="findings">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Findings
+        </button>
+        <button class="nav-btn" data-page="audit">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Audit Logs
+        </button>
+        <button class="nav-btn" data-page="system">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          System Config
+        </button>
+      </nav>
+
+      <div class="user-status" id="userStatus">
+        <span class="status-indicator-offline" id="statusPill">Connecting...</span>
+      </div>
+    </header>
+
+    <!-- Main Container View -->
+    <main class="content-container">
+      <!-- VIEW: LOGIN -->
+      <section id="viewLogin" class="view-panel active">
+        <div class="login-wrapper">
+          <div class="login-card">
+            <div class="login-header">
+              <h2>SentinelAI Access Portal</h2>
+              <p>Multi-Agent Penetration Testing &amp; Vulnerability Assessment Platform</p>
+            </div>
+
+            <div class="demo-mode-alert">
+              <div class="alert-icon">&#x2139;</div>
+              <div class="alert-text">
+                <strong>Offline Demo Ready:</strong> You can select any pre-configured role to instantly test RBAC enforcement, assessment scope controls, and the 6-agent LangGraph workflow.
+              </div>
+            </div>
+
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" required placeholder="admin" value="admin">
+              </div>
+              <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required placeholder="admin123" value="admin123">
+              </div>
+
+              <div class="quick-roles">
+                <span class="quick-label">Quick Sign-in:</span>
+                <button type="button" class="btn-role-chip" data-user="admin" data-pass="admin123">Admin</button>
+                <button type="button" class="btn-role-chip" data-user="analyst" data-pass="analyst123">Analyst</button>
+                <button type="button" class="btn-role-chip" data-user="viewer" data-pass="viewer123">Viewer</button>
+              </div>
+
+              <button type="submit" class="btn-primary btn-block" id="btnLoginSubmit">
+                Authenticate Session
+              </button>
+            </form>
+
+            <div id="loginError" class="error-msg" style="display: none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: DASHBOARD OVERVIEW -->
+      <section id="viewDashboard" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h1>Security Operations Dashboard</h1>
+            <p class="subtitle">Real-time status of agentic security workflows, scope enforcement, and validated telemetry.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary" id="btnRefreshDash">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+            <button class="btn-primary" id="btnNewAssessment">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Create Assessment
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Assessments</div>
+            <div class="stat-value" id="statTotalAssessments">0</div>
+            <div class="stat-meta">Active &amp; Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Completed Assessments</div>
+            <div class="stat-value text-success" id="statCompletedAssessments">0</div>
+            <div class="stat-meta">Passed Verification</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Failed / Cancelled</div>
+            <div class="stat-value text-danger" id="statFailedAssessments">0</div>
+            <div class="stat-meta">Scope Breaches &amp; Stops</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Engine Mode</div>
+            <div class="stat-value text-accent" id="statEngineMode">Demo Mode</div>
+            <div class="stat-meta" id="statGeminiStatus">Gemini: Checked</div>
+          </div>
+        </div>
+
+        <!-- Severity & Active Workflow Split -->
+        <div class="grid-2col">
+          <!-- Severity Breakdown Widget -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Findings Distribution by Severity</h3>
+              <span class="badge-neutral" id="badgeTotalFindings">0 Findings</span>
+            </div>
+            <div class="severity-bars">
+              <div class="bar-row">
+                <span class="bar-label text-critical">Critical</span>
+                <div class="bar-track"><div class="bar-fill bg-critical" id="barCritical" style="width: 0%"></div></div>
+                <span class="bar-count" id="countCritical">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label text-high">High</span>
+                <div class="bar-track"><div class="bar-fill bg-high" id="barHigh" style="width: 0%"></div></div>
+                <span class="bar-count" id="countHigh">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label text-medium">Medium</span>
+                <div class="bar-track"><div class="bar-fill bg-medium" id="barMedium" style="width: 0%"></div></div>
+                <span class="bar-count" id="countMedium">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label text-low">Low</span>
+                <div class="bar-track"><div class="bar-fill bg-low" id="barLow" style="width: 0%"></div></div>
+                <span class="bar-count" id="countLow">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label text-info">Informational</span>
+                <div class="bar-track"><div class="bar-fill bg-info" id="barInfo" style="width: 0%"></div></div>
+                <span class="bar-count" id="countInfo">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Architecture Workflow Status -->
+          <div class="card">
+            <div class="card-header">
+              <h3>LangGraph Multi-Agent Pipeline</h3>
+              <span class="badge-accent">Deterministic StateGraph</span>
+            </div>
+            <div class="agent-flow-preview">
+              <div class="agent-step-mini">
+                <div class="step-num">1</div>
+                <div class="step-info">
+                  <div class="step-name">Scope &amp; Planning</div>
+                  <div class="step-desc">Target validation, check allowlist</div>
+                </div>
+              </div>
+              <div class="agent-step-mini">
+                <div class="step-num">2</div>
+                <div class="step-info">
+                  <div class="step-name">Reconnaissance Analysis</div>
+                  <div class="step-desc">Asset telemetry ingestion</div>
+                </div>
+              </div>
+              <div class="agent-step-mini">
+                <div class="step-num">3</div>
+                <div class="step-info">
+                  <div class="step-name">Vulnerability Analysis</div>
+                  <div class="step-desc">Weakness correlation &amp; CWE</div>
+                </div>
+              </div>
+              <div class="agent-step-mini highlight">
+                <div class="step-num">4</div>
+                <div class="step-info">
+                  <div class="step-name">Evidence Validation</div>
+                  <div class="step-desc">Anti-hallucination verification</div>
+                </div>
+              </div>
+              <div class="agent-step-mini">
+                <div class="step-num">5</div>
+                <div class="step-info">
+                  <div class="step-name">Risk Assessment</div>
+                  <div class="step-desc">Deterministic CVSS &amp; priorities</div>
+                </div>
+              </div>
+              <div class="agent-step-mini">
+                <div class="step-num">6</div>
+                <div class="step-info">
+                  <div class="step-name">Report Generation</div>
+                  <div class="step-desc">JSON &amp; Sanitized HTML output</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Assessments Table -->
+        <div class="card mt-2">
+          <div class="card-header">
+            <h3>Recent Assessments</h3>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="recentAssessmentsTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Scope</th>
+                  <th>Mode</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recentAssessmentsBody">
+                <tr><td colspan="8" class="text-center text-muted py-4">No assessments found. Click 'Create Assessment' to begin.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ASSESSMENTS LIST & CREATE -->
+      <section id="viewAssessments" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h1>Security Assessments</h1>
+            <p class="subtitle">Create and manage scoped penetration testing workflows under strict authorization controls.</p>
+          </div>
+          <button class="btn-primary" id="btnNewAssessment2">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Assessment
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Target Scope</th>
+                  <th>Mode</th>
+                  <th>Approval</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="allAssessmentsBody">
+                <tr><td colspan="8" class="text-center text-muted py-4">Loading assessments...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ASSESSMENT DETAIL & WORKFLOW -->
+      <section id="viewAssessmentDetail" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <div class="breadcrumb">
+              <a href="#" id="linkBackAssessments">&larr; Back to Assessments</a>
+            </div>
+            <h1 id="detailAssessmentName">Assessment Details</h1>
+            <p class="subtitle" id="detailAssessmentSubtitle">ID: ...</p>
+          </div>
+          <div class="header-actions" id="detailActions">
+            <!-- Dynamic action buttons (Approve, Run, Stop, Report) -->
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Metadata Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Assessment Scope &amp; Guardrails</h3>
+              <span id="detailStatusBadge" class="badge-neutral">Draft</span>
+            </div>
+            <div class="meta-list">
+              <div class="meta-row">
+                <span class="meta-k">Assessment Type:</span>
+                <span class="meta-v" id="detailType">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Execution Mode:</span>
+                <span class="meta-v" id="detailMode">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Authorized Targets:</span>
+                <span class="meta-v code-pill" id="detailTargets">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Excluded Targets:</span>
+                <span class="meta-v text-muted" id="detailExcluded">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Allowed Checks:</span>
+                <span class="meta-v" id="detailChecks">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Human Approval:</span>
+                <span class="meta-v" id="detailApprovalState">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Scope Attestation:</span>
+                <span class="meta-v text-success" id="detailAttestation">&#x2714; Confirmed by Creator</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Execution Timeline / Live Agent Progress -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Agent Orchestrator State</h3>
+              <span class="badge-accent" id="detailWorkflowStatus">Idle</span>
+            </div>
+            <div class="agent-timeline" id="agentTimelineContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Findings for this Assessment -->
+        <div class="card mt-2">
+          <div class="card-header">
+            <h3>Assessment Findings</h3>
+            <span class="badge-neutral" id="detailFindingsCount">0 Findings</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Title</th>
+                  <th>Affected Asset</th>
+                  <th>CWE</th>
+                  <th>Confidence</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="detailFindingsBody">
+                <tr><td colspan="6" class="text-center text-muted py-4">No findings yet. Run the workflow to begin automated analysis.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Embedded Report Preview Section (when completed) -->
+        <div class="card mt-2" id="reportPreviewCard" style="display: none;">
+          <div class="card-header">
+            <h3>Security Assessment Report Artifacts</h3>
+            <div class="btn-group">
+              <button class="btn-secondary btn-sm" id="btnViewHtmlReport">Open Full HTML Report</button>
+              <button class="btn-secondary btn-sm" id="btnDownloadJsonReport">Download JSON</button>
+            </div>
+          </div>
+          <div class="report-exec-preview" id="reportExecPreview">
+            <!-- Dynamic executive summary snippet -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: FINDINGS EXPLORER -->
+      <section id="viewFindings" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h1>Findings Explorer</h1>
+            <p class="subtitle">Search, filter, and inspect verified vulnerabilities, CWE mappings, and remediation guidance.</p>
+          </div>
+          <div class="filter-group">
+            <select id="filterSeverity" class="form-select">
+              <option value="">All Severities</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+              <option value="informational">Informational</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Title</th>
+                  <th>Affected Asset</th>
+                  <th>CWE ID</th>
+                  <th>Confidence</th>
+                  <th>Source</th>
+                  <th>Remediation</th>
+                </tr>
+              </thead>
+              <tbody id="globalFindingsBody">
+                <tr><td colspan="7" class="text-center text-muted py-4">No findings available. Run an assessment to generate results.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: AUDIT LOGS -->
+      <section id="viewAudit" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h1>Security Audit Logs</h1>
+            <p class="subtitle">Immutable record of logins, scope authorizations, assessment executions, and report access.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action</th>
+                  <th>User ID</th>
+                  <th>Resource</th>
+                  <th>IP Address</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogsBody">
+                <tr><td colspan="6" class="text-center text-muted py-4">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: SYSTEM CONFIG & STATUS -->
+      <section id="viewSystem" class="view-panel" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h1>System Configuration &amp; Health</h1>
+            <p class="subtitle">Operational parameters, API connectivity, and security boundary controls.</p>
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header">
+              <h3>Gemini &amp; LLM Configuration</h3>
+              <span id="sysGeminiBadge" class="badge-neutral">Checking...</span>
+            </div>
+            <div class="meta-list">
+              <div class="meta-row">
+                <span class="meta-k">Gemini Configured:</span>
+                <span class="meta-v" id="sysGeminiConfigured">No</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Configured Model:</span>
+                <span class="meta-v code-pill" id="sysGeminiModel">gemini-2.0-flash</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Fallback Mode:</span>
+                <span class="meta-v text-success">&#x2714; Deterministic Mock Provider (Active)</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Secret Handling:</span>
+                <span class="meta-v text-success">&#x2714; Masked &amp; Stored on Server Only</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Authorization &amp; Network Scope</h3>
+            </div>
+            <div class="meta-list">
+              <div class="meta-row">
+                <span class="meta-k">Permitted Lab Scope:</span>
+                <span class="meta-v code-pill" id="sysAllowedTargets">192.168.1.0/24, 10.0.0.0/8, lab.local</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Arbitrary Internet Targets:</span>
+                <span class="meta-v text-danger">&#x2716; Strictly Blocked (SSRF Shield)</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Database Backend:</span>
+                <span class="meta-v" id="sysDbType">SQLite (Local)</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Rate Limit:</span>
+                <span class="meta-v" id="sysRateLimit">60 req/min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- MODAL: CREATE ASSESSMENT -->
+    <div id="modalCreateAssessment" class="modal-backdrop" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h2>Create Scoped Assessment</h2>
+          <button class="modal-close" id="btnCloseModal">&times;</button>
+        </div>
+        <form id="createAssessmentForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="inputAsmName">Assessment Name *</label>
+              <input type="text" id="inputAsmName" required placeholder="e.g., Staging API Vulnerability Assessment" value="Staging Environment Security Assessment">
+            </div>
+
+            <div class="grid-2col-compact">
+              <div class="form-group">
+                <label for="selectAsmType">Assessment Type *</label>
+                <select id="selectAsmType" class="form-select">
+                  <option value="web_application">Web Application</option>
+                  <option value="api_security">API Security</option>
+                  <option value="network_service">Network Service</option>
+                  <option value="configuration_audit">Configuration Audit</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="selectAsmMode">Execution Mode *</label>
+                <select id="selectAsmMode" class="form-select">
+                  <option value="demo">Demo Mode (Deterministic Lab)</option>
+                  <option value="gemini_assisted">Gemini LLM Assisted</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputTargets">Authorized Target Scope (Comma-separated) *</label>
+              <input type="text" id="inputTargets" required value="192.168.1.10:8080, 192.168.1.15:443" placeholder="192.168.1.10:8080">
+              <span class="form-hint">Targets must reside in permitted lab CIDRs (192.168.1.0/24, 10.0.0.0/8, or lab.local).</span>
+            </div>
+
+            <div class="form-group">
+              <label for="inputExcludedTargets">Excluded Targets (Optional)</label>
+              <input type="text" id="inputExcludedTargets" value="192.168.1.1" placeholder="192.168.1.1">
+            </div>
+
+            <div class="form-group">
+              <label>Allowed Assessment Checks</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label"><input type="checkbox" id="chkRecon" checked> Reconnaissance</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkVuln" checked> Vulnerability Analysis</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkValid" checked> Evidence Validation</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkRisk" checked> Risk Assessment</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputScopeNotes">Scope Notes</label>
+              <textarea id="inputScopeNotes" rows="2" placeholder="Testing boundaries, maintenance window, or asset criticality">Pre-authorized testing on staging cluster.</textarea>
+            </div>
+
+            <div class="authorization-banner">
+              <label class="checkbox-label auth-checkbox">
+                <input type="checkbox" id="chkAuthorized" required checked>
+                <span><strong>I attest that I have explicit authorization</strong> to evaluate the specified targets and that these assets are within the approved test boundary.</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="btnCancelModal">Cancel</button>
+            <button type="submit" class="btn-primary" id="btnSubmitCreate">Create Assessment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast" style="display: none;"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

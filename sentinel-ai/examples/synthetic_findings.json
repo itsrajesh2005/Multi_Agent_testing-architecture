@@ -1,0 +1,98 @@
+[
+  {
+    "title": "SQL Injection in Search Parameter (Synthetic)",
+    "description": "The application constructs dynamic SQL queries directly from user input without parameterization in the asset search endpoint. (Synthetic laboratory finding).",
+    "affected_asset": "192.168.1.10:8080/api/v1/search",
+    "severity": "critical",
+    "confidence": "confirmed",
+    "validation_status": "confirmed",
+    "evidence": {
+      "request": "GET /api/v1/search?query=test%27+OR+1%3D1--",
+      "response": "HTTP/1.1 200 OK - Syntax error in SQL statement / SQLite exception returned unexpected records",
+      "source": "synthetic_mock_telemetry",
+      "observation": "Differential error response and timing variance confirmed unescaped SQL parameter interpolation"
+    },
+    "cwe_id": "CWE-89",
+    "remediation": "Use parameterized queries or prepared statements via an ORM or database driver. Never concatenate unvalidated user input into SQL commands.",
+    "references": [
+      "https://cwe.mitre.org/data/definitions/89.html",
+      "https://owasp.org/www-community/attacks/SQL_Injection"
+    ],
+    "source_type": "synthetic"
+  },
+  {
+    "title": "Hardcoded JWT Secret Key in Application Configuration (Synthetic)",
+    "description": "Static analysis detected a default weak HMAC secret ('change-this-to-a-random-secret-key') used to sign authorization tokens. (Synthetic laboratory finding).",
+    "affected_asset": "192.168.1.10:8080/app/config.py",
+    "severity": "high",
+    "confidence": "confirmed",
+    "validation_status": "confirmed",
+    "evidence": {
+      "source": "static_code_analysis",
+      "snippet": "JWT_SECRET_KEY = 'change-this-to-a-random-secret-key'",
+      "entropy": "2.4 bits/char (insufficient for cryptographic signature)"
+    },
+    "cwe_id": "CWE-798",
+    "remediation": "Generate a cryptographically secure random key with at least 256 bits of entropy and supply it via an environment variable or secrets manager.",
+    "references": [
+      "https://cwe.mitre.org/data/definitions/798.html"
+    ],
+    "source_type": "synthetic"
+  },
+  {
+    "title": "Cross-Site Scripting (Reflected XSS) in Error Page (Synthetic)",
+    "description": "User-supplied error parameter is reflected in the HTML response without HTML entity encoding or Content-Security-Policy restrictions. (Synthetic laboratory finding).",
+    "affected_asset": "192.168.1.10:8080/error.html",
+    "severity": "medium",
+    "confidence": "confirmed",
+    "validation_status": "confirmed",
+    "evidence": {
+      "request": "GET /error.html?msg=%3Cscript%3Ealert(1)%3C/script%3E",
+      "response": "<div>Error: <script>alert(1)</script></div>",
+      "source": "synthetic_mock_telemetry"
+    },
+    "cwe_id": "CWE-79",
+    "remediation": "Apply contextual output encoding using standard templating engines with auto-escaping enabled and implement a strict Content-Security-Policy (CSP) header.",
+    "references": [
+      "https://cwe.mitre.org/data/definitions/79.html",
+      "https://owasp.org/www-community/attacks/xss/"
+    ],
+    "source_type": "synthetic"
+  },
+  {
+    "title": "Missing Security Headers on Web Service (Synthetic)",
+    "description": "The HTTP response headers omit Strict-Transport-Security (HSTS), X-Content-Type-Options, and Content-Security-Policy headers.",
+    "affected_asset": "192.168.1.10:8080",
+    "severity": "low",
+    "confidence": "confirmed",
+    "validation_status": "confirmed",
+    "evidence": {
+      "missing_headers": ["Strict-Transport-Security", "X-Content-Type-Options", "Content-Security-Policy", "X-Frame-Options"],
+      "source": "synthetic_http_headers"
+    },
+    "cwe_id": "CWE-693",
+    "remediation": "Configure the reverse proxy or web application framework to send modern defense-in-depth security headers on all responses.",
+    "references": [
+      "https://owasp.org/www-project-secure-headers/"
+    ],
+    "source_type": "synthetic"
+  },
+  {
+    "title": "Server Version Banner Disclosure (Synthetic)",
+    "description": "The HTTP response Server header exposes internal web server product name and version number ('Server: Apache/2.4.41 (Ubuntu)').",
+    "affected_asset": "192.168.1.10:8080",
+    "severity": "informational",
+    "confidence": "confirmed",
+    "validation_status": "confirmed",
+    "evidence": {
+      "raw_header": "Server: Apache/2.4.41 (Ubuntu)",
+      "source": "synthetic_http_headers"
+    },
+    "cwe_id": "CWE-200",
+    "remediation": "Suppress detailed server banners in the server configuration (e.g., ServerTokens Prod, ServerSignature Off).",
+    "references": [
+      "https://cwe.mitre.org/data/definitions/200.html"
+    ],
+    "source_type": "synthetic"
+  }
+]

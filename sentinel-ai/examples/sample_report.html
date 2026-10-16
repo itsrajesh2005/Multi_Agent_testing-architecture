@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelAI Security Assessment Report — Q1 Staging Review</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --critical: #ef4444;
+      --high: #f97316;
+      --medium: #f59e0b;
+      --low: #3b82f6;
+      --info: #6b7280;
+      --accent: #6366f1;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2.5rem 1.5rem;
+    }
+    .container { max-width: 1050px; margin: 0 auto; }
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .badge-demo {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--medium);
+      color: var(--medium);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .meta-item strong { display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .metric-count { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.35rem; }
+    .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: var(--text-muted); }
+    .text-critical { color: var(--critical); }
+    .text-high { color: var(--high); }
+    .text-medium { color: var(--medium); }
+    .text-low { color: var(--low); }
+    .text-info { color: var(--info); }
+    section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    h2 { font-size: 1.35rem; margin-bottom: 1rem; color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .finding-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      overflow: hidden;
+    }
+    .finding-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border);
+    }
+    .finding-title { font-size: 1.05rem; font-weight: 600; color: #fff; }
+    .finding-body { padding: 1.25rem; }
+    .finding-meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-muted); }
+    .pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .pill-critical { background: rgba(239, 68, 68, 0.2); color: var(--critical); border: 1px solid var(--critical); }
+    .pill-high { background: rgba(249, 115, 22, 0.2); color: var(--high); border: 1px solid var(--high); }
+    .pill-medium { background: rgba(245, 158, 11, 0.2); color: var(--medium); border: 1px solid var(--medium); }
+    .pill-low { background: rgba(59, 130, 246, 0.2); color: var(--low); border: 1px solid var(--low); }
+    .pill-info { background: rgba(107, 114, 128, 0.2); color: var(--info); border: 1px solid var(--info); }
+    pre {
+      background: #000;
+      color: #38bdf8;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      border: 1px solid var(--border);
+    }
+    ul, ol { padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    footer { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-demo">Laboratory Mode &bull; Synthetic Telemetry</div>
+      <h1>SentinelAI Security Assessment Report</h1>
+      <p style="color: var(--text-muted);">Q1 Staging Environment Synthetic Security Review</p>
+      <div class="meta-grid">
+        <div class="meta-item"><strong>Assessment ID</strong> asm_demo_offline_001</div>
+        <div class="meta-item"><strong>Target Scope</strong> 192.168.1.10:8080, 192.168.1.15:443</div>
+        <div class="meta-item"><strong>Status</strong> <span style="color: var(--success);">&#x2714; Completed</span></div>
+        <div class="meta-item"><strong>Generated At</strong> 2026-10-16 09:00:08 UTC</div>
+      </div>
+    </header>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-count text-critical">1</div>
+        <div class="metric-label">Critical</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-count text-high">1</div>
+        <div class="metric-label">High</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-count text-medium">1</div>
+        <div class="metric-label">Medium</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-count text-low">1</div>
+        <div class="metric-label">Low</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-count text-info">1</div>
+        <div class="metric-label">Informational</div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Executive Summary</h2>
+      <p>SentinelAI conducted an automated, deterministic multi-agent security evaluation of the specified staging assets using pre-approved synthetic evidence telemetry. Five security findings were identified across the target scope: 1 Critical, 1 High, 1 Medium, 1 Low, and 1 Informational. All findings were validated by Agent 4 (Evidence Validation) against factual evidence logs, eliminating unverified claims and hallucinations.</p>
+    </section>
+
+    <section>
+      <h2>Methodology & Multi-Agent Execution</h2>
+      <p>The assessment utilized the SentinelAI 6-Agent LangGraph Orchestrator pipeline:</p>
+      <ul style="margin-top: 0.75rem;">
+        <li><strong>Agent 1 (Scope & Planning):</strong> Established boundary constraints, verified lab target allowlists, and created execution checkpoints.</li>
+        <li><strong>Agent 2 (Reconnaissance Analysis):</strong> Compiled asset fingerprints from synthetic telemetry without generating active network packets.</li>
+        <li><strong>Agent 3 (Vulnerability Analysis):</strong> Detected weakness patterns and correlated them with CWE identifiers.</li>
+        <li><strong>Agent 4 (Evidence Validation):</strong> Evaluated telemetry evidence, filtered duplicates, and labeled confidence levels.</li>
+        <li><strong>Agent 5 (Risk Assessment):</strong> Assigned deterministic CVSS and severity ratings based on environmental exposure and business impact.</li>
+        <li><strong>Agent 6 (Report Generation):</strong> Synthesized executive and technical findings into audited JSON and HTML artifacts.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Detailed Findings</h2>
+
+      <div class="finding-card">
+        <div class="finding-header">
+          <span class="finding-title">SQL Injection in Search Parameter (Synthetic)</span>
+          <span class="pill pill-critical">Critical</span>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta">
+            <span><strong>Asset:</strong> 192.168.1.10:8080/api/v1/search</span>
+            <span><strong>CWE:</strong> CWE-89</span>
+            <span><strong>Confidence:</strong> Confirmed</span>
+          </div>
+          <p>The application constructs dynamic SQL queries directly from user input without parameterization in the asset search endpoint. (Synthetic laboratory finding).</p>
+          <div style="margin-top: 0.75rem;"><strong>Remediation:</strong></div>
+          <p style="color: #93c5fd;">Use parameterized queries or prepared statements via an ORM or database driver. Never concatenate unvalidated user input into SQL commands.</p>
+          <div style="margin-top: 0.75rem;"><strong>Evidence:</strong></div>
+          <pre>GET /api/v1/search?query=test%27+OR+1%3D1--
+HTTP/1.1 200 OK - SQLite error / unexpected records returned</pre>
+        </div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-header">
+          <span class="finding-title">Hardcoded JWT Secret Key in Application Configuration (Synthetic)</span>
+          <span class="pill pill-high">High</span>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta">
+            <span><strong>Asset:</strong> 192.168.1.10:8080/app/config.py</span>
+            <span><strong>CWE:</strong> CWE-798</span>
+            <span><strong>Confidence:</strong> Confirmed</span>
+          </div>
+          <p>Static analysis detected a default weak HMAC secret ('change-this-to-a-random-secret-key') used to sign authorization tokens. (Synthetic laboratory finding).</p>
+          <div style="margin-top: 0.75rem;"><strong>Remediation:</strong></div>
+          <p style="color: #93c5fd;">Generate a cryptographically secure random key with at least 256 bits of entropy and supply it via an environment variable or secrets manager.</p>
+        </div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-header">
+          <span class="finding-title">Cross-Site Scripting (Reflected XSS) in Error Page (Synthetic)</span>
+          <span class="pill pill-medium">Medium</span>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta">
+            <span><strong>Asset:</strong> 192.168.1.10:8080/error.html</span>
+            <span><strong>CWE:</strong> CWE-79</span>
+            <span><strong>Confidence:</strong> Confirmed</span>
+          </div>
+          <p>User-supplied error parameter is reflected in the HTML response without HTML entity encoding or Content-Security-Policy restrictions.</p>
+          <div style="margin-top: 0.75rem;"><strong>Remediation:</strong></div>
+          <p style="color: #93c5fd;">Apply contextual output encoding using standard templating engines with auto-escaping enabled and implement a strict Content-Security-Policy (CSP) header.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Remediation Priorities</h2>
+      <ol>
+        <li><strong>Immediate (P0):</strong> Remediate SQL injection on search endpoint (CWE-89) by implementing parameterized SQL queries.</li>
+        <li><strong>Immediate (P1):</strong> Rotate JWT signing secret in configuration (CWE-798) and inject via environment variable.</li>
+        <li><strong>High (P2):</strong> Implement context-aware HTML entity encoding on error pages (CWE-79) and deploy CSP header.</li>
+        <li><strong>Medium (P3):</strong> Deploy standardized defense-in-depth HTTP security headers (HSTS, CSP, X-Content-Type-Options).</li>
+        <li><strong>Low (P4):</strong> Suppress web server banner version disclosure in production web server configuration.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <p>SentinelAI Multi-Agent Penetration Testing and Security Assessment Platform &bull; Automated Confidential Report</p>
+    </footer>
+  </div>
+</body>
+</html>

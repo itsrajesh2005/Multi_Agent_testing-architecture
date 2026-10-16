@@ -1,0 +1,134 @@
+{
+  "assessment_id": "asm_demo_offline_001",
+  "assessment_name": "Q1 Staging Environment Synthetic Security Review",
+  "assessment_mode": "demo",
+  "scope": {
+    "targets": ["192.168.1.10:8080", "192.168.1.15:443"],
+    "excluded_targets": ["192.168.1.1"],
+    "allowed_checks": ["reconnaissance", "vulnerability_analysis", "evidence_validation", "risk_assessment"],
+    "scope_notes": "Deterministic lab demonstration using synthetic metadata; no real packets transmitted."
+  },
+  "authorization_status": "approved",
+  "started_at": "2026-10-16T09:00:00Z",
+  "completed_at": "2026-10-16T09:00:08Z",
+  "overall_status": "completed",
+  "executive_summary": "SentinelAI conducted an automated, deterministic multi-agent security evaluation of the specified staging assets using pre-approved synthetic evidence telemetry. Five security findings were identified across the target scope: 1 Critical, 1 High, 1 Medium, 1 Low, and 1 Informational. All findings were validated by Agent 4 (Evidence Validation) against factual evidence logs, eliminating unverified claims and hallucinations.",
+  "methodology": "The assessment utilized the SentinelAI 6-Agent LangGraph Orchestrator pipeline. Agent 1 (Scope & Planning) established boundary constraints and authorization limits. Agent 2 (Reconnaissance Analysis) compiled asset fingerprints from synthetic telemetry. Agent 3 (Vulnerability Analysis) detected weakness patterns and correlated them with CWE IDs. Agent 4 (Evidence Validation) verified factual support and eliminated false positives. Agent 5 (Risk Assessment) assigned deterministic CVSS/severity ratings based on exposure and impact. Agent 6 (Report Generation) synthesized this final audited report.",
+  "findings": [
+    {
+      "finding_id": "fnd_001",
+      "title": "SQL Injection in Search Parameter (Synthetic)",
+      "description": "The application constructs dynamic SQL queries directly from user input without parameterization in the asset search endpoint.",
+      "affected_asset": "192.168.1.10:8080/api/v1/search",
+      "severity": "critical",
+      "confidence": "confirmed",
+      "validation_status": "confirmed",
+      "evidence": {
+        "request": "GET /api/v1/search?query=test%27+OR+1%3D1--",
+        "response": "HTTP/1.1 200 OK - SQLite error / unexpected records returned",
+        "source": "synthetic_mock_telemetry"
+      },
+      "cwe_id": "CWE-89",
+      "remediation": "Use parameterized queries or prepared statements via an ORM or database driver. Never concatenate unvalidated user input into SQL commands.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html",
+        "https://owasp.org/www-community/attacks/SQL_Injection"
+      ],
+      "source_type": "synthetic"
+    },
+    {
+      "finding_id": "fnd_002",
+      "title": "Hardcoded JWT Secret Key in Application Configuration (Synthetic)",
+      "description": "Static analysis detected a default weak HMAC secret ('change-this-to-a-random-secret-key') used to sign authorization tokens.",
+      "affected_asset": "192.168.1.10:8080/app/config.py",
+      "severity": "high",
+      "confidence": "confirmed",
+      "validation_status": "confirmed",
+      "evidence": {
+        "source": "static_code_analysis",
+        "snippet": "JWT_SECRET_KEY = 'change-this-to-a-random-secret-key'"
+      },
+      "cwe_id": "CWE-798",
+      "remediation": "Generate a cryptographically secure random key with at least 256 bits of entropy and supply it via an environment variable or secrets manager.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ],
+      "source_type": "synthetic"
+    },
+    {
+      "finding_id": "fnd_003",
+      "title": "Cross-Site Scripting (Reflected XSS) in Error Page (Synthetic)",
+      "description": "User-supplied error parameter is reflected in the HTML response without HTML entity encoding or Content-Security-Policy restrictions.",
+      "affected_asset": "192.168.1.10:8080/error.html",
+      "severity": "medium",
+      "confidence": "confirmed",
+      "validation_status": "confirmed",
+      "evidence": {
+        "request": "GET /error.html?msg=%3Cscript%3Ealert(1)%3C/script%3E",
+        "response": "<div>Error: <script>alert(1)</script></div>"
+      },
+      "cwe_id": "CWE-79",
+      "remediation": "Apply contextual output encoding using standard templating engines with auto-escaping enabled and implement a strict Content-Security-Policy (CSP) header.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/79.html"
+      ],
+      "source_type": "synthetic"
+    },
+    {
+      "finding_id": "fnd_004",
+      "title": "Missing Security Headers on Web Service (Synthetic)",
+      "description": "The HTTP response headers omit Strict-Transport-Security (HSTS), X-Content-Type-Options, and Content-Security-Policy headers.",
+      "affected_asset": "192.168.1.10:8080",
+      "severity": "low",
+      "confidence": "confirmed",
+      "validation_status": "confirmed",
+      "evidence": {
+        "missing_headers": ["Strict-Transport-Security", "X-Content-Type-Options", "Content-Security-Policy"]
+      },
+      "cwe_id": "CWE-693",
+      "remediation": "Configure reverse proxy or web application framework to send modern defense-in-depth security headers.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ],
+      "source_type": "synthetic"
+    },
+    {
+      "finding_id": "fnd_005",
+      "title": "Server Version Banner Disclosure (Synthetic)",
+      "description": "The HTTP response Server header exposes internal web server product name and version number ('Server: Apache/2.4.41 (Ubuntu)').",
+      "affected_asset": "192.168.1.10:8080",
+      "severity": "informational",
+      "confidence": "confirmed",
+      "validation_status": "confirmed",
+      "evidence": {
+        "raw_header": "Server: Apache/2.4.41 (Ubuntu)"
+      },
+      "cwe_id": "CWE-200",
+      "remediation": "Suppress detailed server banners in the server configuration (e.g., ServerTokens Prod).",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/200.html"
+      ],
+      "source_type": "synthetic"
+    }
+  ],
+  "severity_summary": {
+    "critical": 1,
+    "high": 1,
+    "medium": 1,
+    "low": 1,
+    "informational": 1
+  },
+  "limitations": [
+    "Assessment executed in synthetic demonstration mode; findings reflect modeled laboratory vulnerabilities rather than live network exploitation.",
+    "Autonomous exploitation, credential stuffing, and destructive payloads are intentionally disabled by architectural policy.",
+    "Dynamic findings are subject to validation limits of the supplied telemetry."
+  ],
+  "remediation_priorities": [
+    "Immediate (P0): Remediate SQL injection on search endpoint (CWE-89) by implementing parameterized SQL queries.",
+    "Immediate (P1): Rotate JWT signing secret in configuration (CWE-798) and inject via environment variable.",
+    "High (P2): Implement context-aware HTML entity encoding on error pages (CWE-79) and deploy CSP header.",
+    "Medium (P3): Deploy standardized defense-in-depth HTTP security headers (HSTS, CSP, X-Content-Type-Options).",
+    "Low (P4): Suppress web server banner version disclosure in production web server configuration."
+  ],
+  "generated_at": "2026-10-16T09:00:08Z"
+}

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelAI Security Assessment Report — Automated Demonstration Security Assessment</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #eab308;
+            --low: #22c55e;
+            --info: #6366f1;
+            --border: #334155;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-secondary), #0f172a);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .header-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .header h1 { font-size: 1.8rem; }
+        .header p { color: var(--text-secondary); }
+        .report-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .meta-box {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .meta-box .meta-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+        }
+        .meta-box .meta-val {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-demo { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b44; }
+        .badge-live { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+        .badge-status-completed { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e55; }
+        .badge-status-running { background: #0284c722; color: #38bdf8; border: 1px solid #0284c755; }
+        .badge-status-failed { background: #ef444422; color: #f87171; border: 1px solid #ef444455; }
+        .badge-synthetic { background: #d9770622; color: #fbbf24; border: 1px solid #d9770655; }
+        .badge-unverified { background: #64748b22; color: #cbd5e1; border: 1px solid #64748b55; }
+        .badge-unmapped { background: #dc262622; color: #fca5a5; border: 1px solid #dc262655; }
+        .badge-unmapped-sm { background: #dc262622; color: #fca5a5; border: 1px solid #dc262655; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; }
+        .badge-mapped { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a55; }
+        .badge-mapped-sm { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a55; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; }
+        .badge-gemini-active { background: #8b5cf622; color: #a78bfa; border: 1px solid #8b5cf655; }
+        .badge-gemini-inactive { background: #64748b22; color: #94a3b8; border: 1px solid #64748b55; }
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .severity-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .severity-box {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .severity-box.critical { border-color: var(--critical); background: #ef444415; }
+        .severity-box.high { border-color: var(--high); background: #f9731615; }
+        .severity-box.medium { border-color: var(--medium); background: #eab30815; }
+        .severity-box.low { border-color: var(--low); background: #22c55e15; }
+        .severity-box.info { border-color: var(--info); background: #6366f115; }
+        .severity-box .count { font-size: 2rem; font-weight: 700; }
+        .severity-box .label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+        .finding-card {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-left: 4px solid var(--border);
+        }
+        .finding-card.severity-critical { border-left-color: var(--critical); }
+        .finding-card.severity-high { border-left-color: var(--high); }
+        .finding-card.severity-medium { border-left-color: var(--medium); }
+        .finding-card.severity-low { border-left-color: var(--low); }
+        .finding-card.severity-informational { border-left-color: var(--info); }
+        .finding-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .finding-id { font-family: monospace; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; }
+        .severity-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .severity-badge.severity-critical { background: var(--critical); color: white; }
+        .severity-badge.severity-high { background: var(--high); color: white; }
+        .severity-badge.severity-medium { background: var(--medium); color: #1e293b; }
+        .severity-badge.severity-low { background: var(--low); color: #1e293b; }
+        .severity-badge.severity-informational { background: var(--info); color: white; }
+        .finding-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.5rem 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .finding-field strong { color: #cbd5e1; }
+        .finding-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #f8fafc; }
+        .description-text { color: #d1d5db; font-size: 0.9rem; margin-top: 0.25rem; }
+        .evidence-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.35rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #93c5fd;
+        }
+        .finding-limitations {
+            list-style: disc;
+            margin-left: 1.5rem;
+            color: #fca5a5;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        .remediation {
+            background: var(--bg-secondary);
+            padding: 0.85rem 1rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            border-left: 3px solid #38bdf8;
+        }
+        .remediation-text {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+        .asset-unmapped { color: #f87171; font-weight: 600; font-family: monospace; }
+        .asset-mapped { color: #4ade80; font-weight: 500; font-family: monospace; }
+        .demo-warning {
+            background: #f59e0b15;
+            border: 1px solid #f59e0b44;
+            color: #fbbf24;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .scope-alert-box {
+            background: #ef444415;
+            border: 1px solid #ef444444;
+            color: #fca5a5;
+            padding: 0.85rem 1rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .scope-success-box {
+            background: #22c55e15;
+            border: 1px solid #22c55e44;
+            color: #86efac;
+            padding: 0.85rem 1rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .priority-card {
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #38bdf8;
+        }
+        .priority-text {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        @media print {
+            body { background: white; color: #1e293b; padding: 1rem; }
+            .finding-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title-row">
+                <h1>🛡️ SentinelAI Security Assessment Report</h1>
+                <div><span class="badge badge-demo">DEMO MODE</span></div>
+            </div>
+            <p>Assessment: <strong>Automated Demonstration Security Assessment</strong> (ID: 9cac9a7df5c043c4ba910cab1e060ca9)</p>
+            
+            <div class="report-meta-grid">
+                <div class="meta-box">
+                    <div class="meta-title">Execution Status</div>
+                    <div class="meta-val"><span class="badge badge-status-completed">COMPLETED</span></div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-title">Overall Risk Rating</div>
+                    <div class="meta-val"><span class="severity-badge severity-critical">CRITICAL</span></div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-title">AI / Gemini Engine</div>
+                    <div class="meta-val"><span class="badge badge-gemini-inactive">GEMINI NOT USED (DETERMINISTIC FALLBACK)</span></div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-title">Generated At</div>
+                    <div class="meta-val" style="font-size: 0.85rem; font-weight: normal; color: var(--text-secondary);">2026-10-16T14:31:07.929139+00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-warning">⚠️ SYNTHETIC EVIDENCE NOTICE — Findings labeled as SYNTHETIC were generated for simulation/demonstration purposes. They have NOT been verified against live systems and must NOT be treated as confirmed vulnerabilities.</div>
+
+        <div class="section">
+            <h2>📋 Executive Summary</h2>
+            <pre>[DEMO MODE (SYNTHETIC EVIDENCE)] Security Assessment Report — Automated Demonstration Security Assessment
+
+This security assessment identified 7 potential findings with an overall risk rating of CRITICAL.
+Severity breakdown: 2 critical, 1 high, 2 medium, 2 low.
+
+IMPORTANT: This assessment was conducted in demonstration mode using synthetic evidence. All findings are hypothetical and should be validated through actual security testing before taking remediation action.
+
+Immediate attention is recommended for critical and high-severity findings. A detailed remediation plan with prioritized actions is provided in the findings section.</pre>
+        </div>
+
+        <div class="section">
+            <h2>📊 Severity Summary</h2>
+            <div class="severity-grid">
+                <div class="severity-box critical">
+                    <div class="count" style="color: var(--critical);">2</div>
+                    <div class="label">Critical</div>
+                </div>
+                <div class="severity-box high">
+                    <div class="count" style="color: var(--high);">1</div>
+                    <div class="label">High</div>
+                </div>
+                <div class="severity-box medium">
+                    <div class="count" style="color: var(--medium);">2</div>
+                    <div class="label">Medium</div>
+                </div>
+                <div class="severity-box low">
+                    <div class="count" style="color: var(--low);">2</div>
+                    <div class="label">Low</div>
+                </div>
+                <div class="severity-box info">
+                    <div class="count" style="color: var(--info);">0</div>
+                    <div class="label">Info</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Scope & Target Verification</h2>
+            <p><strong>Authorized Scope Targets:</strong> 192.168.1.10:8080</p>
+            <p><strong>Execution Mode:</strong> demo</p>
+            <p><strong>AI Engine Status:</strong> Deterministic fallback engine executed; Gemini was not invoked or was unavailable.</p>
+            <p><strong>Authorization Status:</strong> confirmed</p>
+            
+        <div class="scope-alert-box">
+            <strong>⚠️ Target Scope Alert:</strong> 7 of 7 finding(s) reference assets not present in the authorized target scope (api.lab.local, db.lab.local:5432, db.lab.local:8443, demo.lab.local).
+            These findings have been flagged as unmapped and should not be assumed to belong to the target environment.
+        </div>
+        
+        </div>
+
+        <div class="section">
+            <h2>🔬 Methodology</h2>
+            <pre>This assessment was conducted in DEMO MODE using the following methodology:
+1. Scope Validation — Verified assessment scope against authorized targets
+2. Synthetic Reconnaissance — Analyzed predefined synthetic asset inventory
+3. Vulnerability Analysis — Applied synthetic findings based on common security weaknesses
+4. Evidence Validation — Checked finding consistency and detected duplicates
+5. Risk Assessment — Applied deterministic severity rules based on finding characteristics
+6. Report Generation — Compiled findings into structured report format
+
+NOTE: No live scanning, network probes, or external API calls were performed. All evidence is synthetic and for demonstration purposes only.</pre>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Findings (7)</h2>
+            
+        <div class="finding-card severity-critical">
+            <div class="finding-header">
+                <span class="finding-id">FIND-001</span>
+                <span class="severity-badge severity-critical">CRITICAL</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Outdated TLS Configuration</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">demo.lab.local</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-326</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">The web server supports TLS 1.0 and 1.1, which are deprecated protocols with known cryptographic weaknesses. An attacker in a network position could potentially exploit protocol downgrade attacks to intercept encrypted communications.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic configuration review: TLS 1.0 and 1.1 protocols enabled in nginx.conf</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;demo.lab.local&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Disable TLS 1.0 and 1.1 in the web server configuration. Enable only TLS 1.2 and 1.3 with strong cipher suites (e.g., ECDHE+AESGCM). Test with tools like SSL Labs.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-critical">
+            <div class="finding-header">
+                <span class="finding-id">FIND-002</span>
+                <span class="severity-badge severity-critical">CRITICAL</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Dependency with Known Remote Code Execution Vulnerability</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">api.lab.local</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-1395</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">The API server uses a dependency (synthetic-lib v1.2.3) with a known remote code execution vulnerability. An unauthenticated attacker could send specially crafted requests to execute arbitrary code on the server.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic dependency audit: synthetic-lib@1.2.3 flagged with known RCE vulnerability</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;api.lab.local&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Update synthetic-lib to version 1.2.5 or later. If immediate update is not possible, implement Web Application Firewall rules to block known exploit patterns. Review application code that uses the vulnerable library for additional hardening.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-high">
+            <div class="finding-header">
+                <span class="finding-id">FIND-003</span>
+                <span class="severity-badge severity-high">HIGH</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Database Exposed to Non-Application Networks</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">db.lab.local:5432</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-284</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">The PostgreSQL database on port 5432 is accessible from network segments beyond the application tier. This violates the principle of least privilege and could allow direct database access from compromised hosts in adjacent network zones.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic network topology review: database port open to 192.168.1.0/24 (wider than application tier)</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;db.lab.local:5432&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Restrict database access to application-tier hosts only using host-based firewall rules (iptables/nftables) or network segmentation (VLANs). Update pg_hba.conf to allow connections only from the application server IP.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-medium">
+            <div class="finding-header">
+                <span class="finding-id">FIND-004</span>
+                <span class="severity-badge severity-medium">MEDIUM</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Overly Permissive CORS Configuration</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">api.lab.local</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-942</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">The API server has CORS configured with Access-Control-Allow-Origin set to &#x27;*&#x27;, allowing any origin to make cross-origin requests. Combined with credential handling, this could enable cross-site request forgery or data exfiltration from authenticated sessions.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic configuration review: CORS origin set to wildcard &#x27;*&#x27; in Express middleware</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;api.lab.local&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Replace the wildcard CORS origin with a specific allowlist of trusted domains. Ensure Access-Control-Allow-Credentials is not used with wildcard origins. Implement proper CORS validation in the API middleware.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-medium">
+            <div class="finding-header">
+                <span class="finding-id">FIND-005</span>
+                <span class="severity-badge severity-medium">MEDIUM</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Database Management Interface Exposed</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">db.lab.local:8443</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-1188</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">pgAdmin is accessible on port 8443 of the database server. Administrative database management interfaces should not be exposed to the network and should require VPN or bastion host access.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic port scan: pgAdmin web interface detected on port 8443</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;db.lab.local:8443&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Restrict pgAdmin access to localhost or a dedicated management network. Require VPN access for remote database administration. If pgAdmin is not needed, remove or disable it entirely.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-low">
+            <div class="finding-header">
+                <span class="finding-id">FIND-006</span>
+                <span class="severity-badge severity-low">LOW</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Missing HTTP Security Headers</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">demo.lab.local</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-693</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">The web application does not set critical HTTP security headers including X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, and Content-Security-Policy. This increases the attack surface for clickjacking, MIME-type confusion, and cross-site scripting attacks.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic HTTP response analysis: security headers absent from server responses</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;demo.lab.local&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Configure the web server to include: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Strict-Transport-Security: max-age=31536000, and a restrictive Content-Security-Policy.</p>
+            </div>
+        </div>
+        
+        <div class="finding-card severity-low">
+            <div class="finding-header">
+                <span class="finding-id">FIND-007</span>
+                <span class="severity-badge severity-low">LOW</span>
+                <span class="badge badge-synthetic">SYNTHETIC EVIDENCE (DEMO)</span>
+                <span class="badge badge-unmapped">⚠️ UNMAPPED ASSET</span>
+                <span class="badge badge-unverified">NOT LIVE VERIFIED</span>
+            </div>
+            <h3>Verbose Error Messages Exposing Internal Details</h3>
+            
+            <div class="finding-details-grid">
+                <div class="finding-field">
+                    <strong>Affected Asset:</strong> <span class="asset-unmapped">api.lab.local</span> <span class="badge badge-unmapped-sm">⚠️ Unmapped — Outside Authorized Scope Targets</span>
+                </div>
+                <div class="finding-field">
+                    <strong>Evidence Provenance:</strong> Synthetic Demonstration Finding (Predefined Security Weakness Scenario)
+                </div>
+                <div class="finding-field">
+                    <strong>Confidence Level:</strong> Suspected (Synthetic Simulation)
+                </div>
+                <div class="finding-field">
+                    <strong>Verification Status:</strong> Suspected / Unverified — Synthetic test scenario (not verified on live target)
+                </div>
+                <div class="finding-field"><strong>CWE Identifier:</strong> CWE-209</div>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Description:</strong>
+                <p class="description-text">API error responses include detailed stack traces, internal file paths, and database query information. This information could help an attacker understand the application architecture and identify specific vulnerabilities to target.</p>
+            </div>
+
+            <div class="finding-field" style="margin-top: 0.75rem;">
+                <strong>Evidence:</strong>
+                <pre class="evidence-box">Synthetic API response review: error responses contain traceback and internal paths</pre>
+            </div>
+
+            <div class="finding-field"><strong>Finding Limitations:</strong><ul class="finding-limitations"><li>Synthetic evidence generated for simulation; this finding has not been validated on a live target and is not a confirmed vulnerability.</li><li>Affected asset &#x27;api.lab.local&#x27; does not map to any authorized target in assessment scope (192.168.1.10:8080).</li><li>Theoretical finding based on configuration checks. Exploitability has not been proven.</li></ul></div>
+
+            <div class="remediation">
+                <strong>Remediation & Recommendation:</strong>
+                <p class="remediation-text">Implement generic error responses for production environments. Log detailed error information server-side only. Ensure debug mode is disabled in production. Use a centralized error handler that sanitizes responses.</p>
+            </div>
+        </div>
+        
+        </div>
+
+        <div class="section">
+            <h2>⚠️ Assessment Limitations</h2>
+            <pre>• DEMO MODE: All findings are synthetic and for demonstration purposes only.
+• OUT-OF-SCOPE ASSET: Finding &#x27;Outdated TLS Configuration&#x27; asset &#x27;demo.lab.local&#x27; does not map to approved targets.
+• Real dependency manifest needed for dependency audit
+• Excluded targets strictly prohibited from testing: 192.168.1.1
+• No live network scanning performed
+• OUT-OF-SCOPE ASSET: Finding &#x27;Dependency with Known Remote Code Execution Vulnerability&#x27; asset &#x27;api.lab.local&#x27; does not map to approved targets.
+• Live TLS scan results needed to confirm TLS findings
+• OUT-OF-SCOPE ASSET: Finding &#x27;Missing HTTP Security Headers&#x27; asset &#x27;demo.lab.local&#x27; does not map to approved targets.
+• OUT-OF-SCOPE ASSET: Finding &#x27;Database Exposed to Non-Application Networks&#x27; asset &#x27;db.lab.local:5432&#x27; does not map to approved targets.
+• OUT-OF-SCOPE ASSET: Finding &#x27;Verbose Error Messages Exposing Internal Details&#x27; asset &#x27;api.lab.local&#x27; does not map to approved targets.
+• Demo mode — analysis uses synthetic evidence only
+• Network scan needed to confirm port exposure findings
+• Actual HTTP response headers needed for header analysis
+• OUT-OF-SCOPE ASSET: Finding &#x27;Overly Permissive CORS Configuration&#x27; asset &#x27;api.lab.local&#x27; does not map to approved targets.
+• OUT-OF-SCOPE ASSET: Finding &#x27;Database Management Interface Exposed&#x27; asset &#x27;db.lab.local:8443&#x27; does not map to approved targets.</pre>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Remediation Priorities</h2>
+            
+        <div class="priority-card">
+            <p class="priority-text">Priority 1 [CRITICAL]: Outdated TLS Configuration — Disable TLS 1.0 and 1.1 in the web server configuration. Enable only TLS 1.2 and 1.3 with strong cipher suites (e.g., ECDHE+AESGCM). Test with tools like SSL Labs.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 2 [CRITICAL]: Dependency with Known Remote Code Execution Vulnerability — Update synthetic-lib to version 1.2.5 or later. If immediate update is not possible, implement Web Application Firewall rules to block known exploit patterns. Review application code that uses the vulnerable library for additional hardening.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 3 [HIGH]: Database Exposed to Non-Application Networks — Restrict database access to application-tier hosts only using host-based firewall rules (iptables/nftables) or network segmentation (VLANs). Update pg_hba.conf to allow connections only from the application server IP.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 4 [MEDIUM]: Overly Permissive CORS Configuration — Replace the wildcard CORS origin with a specific allowlist of trusted domains. Ensure Access-Control-Allow-Credentials is not used with wildcard origins. Implement proper CORS validation in the API middleware.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 5 [MEDIUM]: Database Management Interface Exposed — Restrict pgAdmin access to localhost or a dedicated management network. Require VPN access for remote database administration. If pgAdmin is not needed, remove or disable it entirely.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 6 [LOW]: Missing HTTP Security Headers — Configure the web server to include: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Strict-Transport-Security: max-age=31536000, and a restrictive Content-Security-Policy.</p>
+        </div>
+        
+        <div class="priority-card">
+            <p class="priority-text">Priority 7 [LOW]: Verbose Error Messages Exposing Internal Details — Implement generic error responses for production environments. Log detailed error information server-side only. Ensure debug mode is disabled in production. Use a centralized error handler that sanitizes responses.</p>
+        </div>
+        
+        </div>
+
+        <div class="footer">
+            <p>Generated by SentinelAI — Multi-Agent Penetration Testing Platform</p>
+            <p>This report is confidential and intended for authorized recipients only.</p>
+        </div>
+    </div>
+</body>
+</html>

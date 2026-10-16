@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#090d16; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#4f46e5" flood-opacity="0.25"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arrow-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#818cf8" />
+    </marker>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="500" y="42" text-anchor="middle" fill="#f8fafc" font-size="22" font-weight="700" letter-spacing="0.5">SentinelAI Multi-Agent Penetration Testing Architecture</text>
+  <text x="500" y="65" text-anchor="middle" fill="#94a3b8" font-size="12">Deterministic Security Controls + LangGraph Multi-Agent Orchestration + Google Gemini LLM</text>
+
+  <!-- LAYER 1: CLIENT & DASHBOARD -->
+  <rect x="50" y="90" width="900" height="70" rx="10" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5" />
+  <text x="70" y="125" fill="#f8fafc" font-size="14" font-weight="600">Client &amp; Analyst Layer</text>
+  <rect x="230" y="105" width="220" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.5" />
+  <text x="340" y="130" text-anchor="middle" fill="#c7d2fe" font-size="12" font-weight="600">Interactive Security Dashboard</text>
+  <rect x="470" y="105" width="220" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.5" />
+  <text x="580" y="130" text-anchor="middle" fill="#c7d2fe" font-size="12" font-weight="600">FastAPI REST Client / SDK</text>
+  <rect x="710" y="105" width="215" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.5" />
+  <text x="817" y="130" text-anchor="middle" fill="#c7d2fe" font-size="12" font-weight="600">Human Approval Gate (HitL)</text>
+
+  <!-- Connector 1 -->
+  <line x1="500" y1="160" x2="500" y2="185" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- LAYER 2: SECURITY GATEWAY -->
+  <rect x="50" y="185" width="900" height="75" rx="10" fill="url(#cardGrad)" stroke="#0284c7" stroke-width="1.5" />
+  <text x="70" y="222" fill="#38bdf8" font-size="14" font-weight="600">Security Gateway</text>
+  <rect x="220" y="200" width="165" height="44" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="1" />
+  <text x="302" y="220" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="600">JWT Auth &amp; RBAC</text>
+  <text x="302" y="234" text-anchor="middle" fill="#7dd3fc" font-size="9">Admin / Analyst / Viewer</text>
+
+  <rect x="400" y="200" width="180" height="44" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="1" />
+  <text x="490" y="220" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="600">Scope Validator (SSRF)</text>
+  <text x="490" y="234" text-anchor="middle" fill="#7dd3fc" font-size="9">Strict CIDR/DNS Lab Allowlist</text>
+
+  <rect x="595" y="200" width="165" height="44" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="1" />
+  <text x="677" y="220" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="600">Approval Guard</text>
+  <text x="677" y="234" text-anchor="middle" fill="#7dd3fc" font-size="9">Requires Explicit Approval</text>
+
+  <rect x="775" y="200" width="150" height="44" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="1" />
+  <text x="850" y="220" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="600">Audit Logging</text>
+  <text x="850" y="234" text-anchor="middle" fill="#7dd3fc" font-size="9">Immutable Event Trail</text>
+
+  <!-- Connector 2 -->
+  <line x1="500" y1="260" x2="500" y2="285" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- LAYER 3: LANGGRAPH MULTI-AGENT ORCHESTRATOR -->
+  <rect x="50" y="285" width="900" height="235" rx="10" fill="#0a0f1d" stroke="#6366f1" stroke-width="1.8" filter="url(#glow)" />
+  <text x="70" y="315" fill="#a5b4fc" font-size="15" font-weight="700">LangGraph Multi-Agent Orchestration Engine</text>
+  <text x="500" y="315" text-anchor="middle" fill="#64748b" font-size="11">Deterministic StateGraph State Machine Passing Typed Context State</text>
+
+  <!-- 6 Agents in Workflow Sequence -->
+  <!-- Agent 1 -->
+  <g transform="translate(65, 335)">
+    <rect width="135" height="165" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" />
+    <circle cx="20" cy="22" r="10" fill="#4338ca" />
+    <text x="20" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">1</text>
+    <text x="36" y="25" fill="#f8fafc" font-size="10.5" font-weight="700">Scope &amp; Plan</text>
+    <line x1="8" y1="40" x2="127" y2="40" stroke="#334155" />
+    <text x="12" y="58" fill="#94a3b8" font-size="9">• Target Validation</text>
+    <text x="12" y="74" fill="#94a3b8" font-size="9">• Boundary Setting</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• Check Enumeration</text>
+    <text x="12" y="106" fill="#94a3b8" font-size="9">• Execution Plan</text>
+    <rect x="12" y="128" width="111" height="24" rx="4" fill="#312e81" />
+    <text x="67" y="144" text-anchor="middle" fill="#c7d2fe" font-size="8.5" font-weight="600">Structured Plan</text>
+  </g>
+
+  <line x1="202" y1="415" x2="216" y2="415" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- Agent 2 -->
+  <g transform="translate(218, 335)">
+    <rect width="135" height="165" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" />
+    <circle cx="20" cy="22" r="10" fill="#4338ca" />
+    <text x="20" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">2</text>
+    <text x="36" y="25" fill="#f8fafc" font-size="10.5" font-weight="700">Recon Analysis</text>
+    <line x1="8" y1="40" x2="127" y2="40" stroke="#334155" />
+    <text x="12" y="58" fill="#94a3b8" font-size="9">• Asset Telemetry</text>
+    <text x="12" y="74" fill="#94a3b8" font-size="9">• Attack Surface</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• Safe Metadata</text>
+    <text x="12" y="106" fill="#94a3b8" font-size="9">• Synthetic Ingest</text>
+    <rect x="12" y="128" width="111" height="24" rx="4" fill="#312e81" />
+    <text x="67" y="144" text-anchor="middle" fill="#c7d2fe" font-size="8.5" font-weight="600">Recon State</text>
+  </g>
+
+  <line x1="355" y1="415" x2="369" y2="415" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- Agent 3 -->
+  <g transform="translate(371, 335)">
+    <rect width="135" height="165" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" />
+    <circle cx="20" cy="22" r="10" fill="#4338ca" />
+    <text x="20" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">3</text>
+    <text x="36" y="25" fill="#f8fafc" font-size="10.5" font-weight="700">Vuln Analysis</text>
+    <line x1="8" y1="40" x2="127" y2="40" stroke="#334155" />
+    <text x="12" y="58" fill="#94a3b8" font-size="9">• Weakness Correl.</text>
+    <text x="12" y="74" fill="#94a3b8" font-size="9">• CWE Association</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• Severity Hypoth.</text>
+    <text x="12" y="106" fill="#94a3b8" font-size="9">• Non-destructive</text>
+    <rect x="12" y="128" width="111" height="24" rx="4" fill="#312e81" />
+    <text x="67" y="144" text-anchor="middle" fill="#c7d2fe" font-size="8.5" font-weight="600">Candidate Vulns</text>
+  </g>
+
+  <line x1="508" y1="415" x2="522" y2="415" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- Agent 4 -->
+  <g transform="translate(524, 335)">
+    <rect width="135" height="165" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8" />
+    <circle cx="20" cy="22" r="10" fill="#b45309" />
+    <text x="20" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">4</text>
+    <text x="36" y="25" fill="#fcd34d" font-size="10.5" font-weight="700">Evidence Guard</text>
+    <line x1="8" y1="40" x2="127" y2="40" stroke="#334155" />
+    <text x="12" y="58" fill="#94a3b8" font-size="9">• Anti-Hallucination</text>
+    <text x="12" y="74" fill="#94a3b8" font-size="9">• Telemetry Check</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• Deduplication</text>
+    <text x="12" y="106" fill="#94a3b8" font-size="9">• Status: Verified</text>
+    <rect x="12" y="128" width="111" height="24" rx="4" fill="#78350f" />
+    <text x="67" y="144" text-anchor="middle" fill="#fef3c7" font-size="8.5" font-weight="600">Validated Set</text>
+  </g>
+
+  <line x1="661" y1="415" x2="675" y2="415" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- Agent 5 -->
+  <g transform="translate(677, 335)">
+    <rect width="135" height="165" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" />
+    <circle cx="20" cy="22" r="10" fill="#4338ca" />
+    <text x="20" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">5</text>
+    <text x="36" y="25" fill="#f8fafc" font-size="10.5" font-weight="700">Risk Assessment</text>
+    <line x1="8" y1="40" x2="127" y2="40" stroke="#334155" />
+    <text x="12" y="58" fill="#94a3b8" font-size="9">• CVSS Scoring</text>
+    <text x="12" y="74" fill="#94a3b8" font-size="9">• Exposure Analysis</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• Business Impact</text>
+    <text x="12" y="106" fill="#94a3b8" font-size="9">• Remediation P0-P4</text>
+    <rect x="12" y="128" width="111" height="24" rx="4" fill="#312e81" />
+    <text x="67" y="144" text-anchor="middle" fill="#c7d2fe" font-size="8.5" font-weight="600">Scored Risks</text>
+  </g>
+
+  <line x1="814" y1="415" x2="828" y2="415" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow-active)" />
+
+  <!-- Agent 6 -->
+  <g transform="translate(830, 335)">
+    <rect width="105" height="165" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.8" />
+    <circle cx="18" cy="22" r="10" fill="#047857" />
+    <text x="18" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">6</text>
+    <text x="34" y="25" fill="#6ee7b7" font-size="10" font-weight="700">Report Gen</text>
+    <line x1="6" y1="40" x2="99" y2="40" stroke="#334155" />
+    <text x="8" y="58" fill="#94a3b8" font-size="8.5">• Exec Summary</text>
+    <text x="8" y="74" fill="#94a3b8" font-size="8.5">• Methodology</text>
+    <text x="8" y="90" fill="#94a3b8" font-size="8.5">• HTML Builder</text>
+    <text x="8" y="106" fill="#94a3b8" font-size="8.5">• JSON Artifact</text>
+    <rect x="8" y="128" width="89" height="24" rx="4" fill="#064e3b" />
+    <text x="52" y="144" text-anchor="middle" fill="#a7f3d0" font-size="8" font-weight="600">Report Final</text>
+  </g>
+
+  <!-- LLM & Fallback Reasoning side card -->
+  <!-- Connector down to storage -->
+  <line x1="500" y1="520" x2="500" y2="550" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- LAYER 4: STORAGE & DELIVERABLES -->
+  <rect x="50" y="550" width="900" height="90" rx="10" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5" />
+  <text x="70" y="585" fill="#34d399" font-size="14" font-weight="600">Storage &amp; Deliverables</text>
+
+  <rect x="230" y="565" width="200" height="60" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="330" y="590" text-anchor="middle" fill="#a7f3d0" font-size="11" font-weight="600">SQLAlchemy Database</text>
+  <text x="330" y="608" text-anchor="middle" fill="#6ee7b7" font-size="9.5">SQLite / PostgreSQL Schema</text>
+
+  <rect x="450" y="565" width="200" height="60" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="550" y="590" text-anchor="middle" fill="#a7f3d0" font-size="11" font-weight="600">Validated JSON Report</text>
+  <text x="550" y="608" text-anchor="middle" fill="#6ee7b7" font-size="9.5">Pydantic ReportSchema</text>
+
+  <rect x="670" y="565" width="250" height="60" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="795" y="590" text-anchor="middle" fill="#a7f3d0" font-size="11" font-weight="600">Sanitized HTML Report</text>
+  <text x="795" y="608" text-anchor="middle" fill="#6ee7b7" font-size="9.5">Executive View + Escaped Entities</text>
+
+</svg>
